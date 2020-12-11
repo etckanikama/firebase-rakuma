@@ -5,6 +5,9 @@ from firebase_admin import firestore
 from base64 import a85encode
 import os
 from selenium.webdriver import Chrome, ChromeOptions
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions
+from selenium.webdriver.common.by import By
 import time
 import datetime
 import pandas as pd
@@ -44,6 +47,8 @@ def myprint(a):
     return 'Hello '+a+' !'
 
 def set_driver(driver_path, headless_flg):
+    # これは自分の場合のログインを保持するためのChromeのぱす
+    PROFILE_PATH = "C:\\Users\\hirayama\\AppData\\Local\\Google\\Chrome\\User Data"
     # Chromeドライバーの読み込み
     options = ChromeOptions()
 
@@ -57,6 +62,7 @@ def set_driver(driver_path, headless_flg):
     # options.add_argument('log-level=3')
     options.add_argument('--ignore-certificate-errors')
     options.add_argument('--ignore-ssl-errors')
+    options.add_argument('--user-data-dir=C:\\Users\\hirayama\\AppData\\Local\\Google\\Chrome\\User Data\\Default')
     # options.add_argument('--incognito')          # シークレットモードの設定を付与
 
     # ChromeのWebDriverオブジェクトを作成する。
@@ -65,7 +71,8 @@ def set_driver(driver_path, headless_flg):
 
 def listing():
 
-    FIST_URL = "https://fril.jp/"
+    FIST_URL = "https://fril.jp/item/new"
+    
     # driverを起動
     if os.name == 'nt': #Windows
         driver = set_driver("chromedriver.exe", False)
@@ -80,19 +87,42 @@ def listing():
     # （あったらログインボタンを開く→その後に手動ログインをする）
     # なくなるまで待機
     # なかったらその後の処理を実行
-    login_button_get = driver.find_element_by_xpath("//li[@class='loginMenu__listItem']/a[@class='button button--NoBorderSmall ga-class ga-login-button ga-guest']")
+    # login_button_get = driver.find_element_by_xpath("//li[@class='loginMenu__listItem']/a[@class='button button--NoBorderSmall ga-class ga-login-button ga-guest']")
     
-    time.sleep(10)
-    print(login_button_get.text)
-    login_url = login_button_get.get_attribute("href")
+    # time.sleep(10)
+    # print(login_button_get.text)
+    # login_url = login_button_get.get_attribute("href")
     # print(login_url)
-    driver.get(f'{login_url}')
+    # driver.get(f'{login_url}')
+    # time.sleep(10)
+    #指定したdriverに対して最大で10秒間待つように設定する
+    wait = WebDriverWait(driver, 1000)
+    element = wait.until(expected_conditions.visibility_of_element_located((By.CLASS_NAME, "headerMenu__text")))
+    driver.get(FIST_URL)
     time.sleep(10)
 
-    # mailアドレスの所と、パスワードのところの要素をとってくる機能
-    # その要素に特定の値を書きこむ関数
-
-    # ある状態になるまで（今回は画像認証が終わるまで＝＝次の画面に行く）待機する関数
+    # 何がsend_keysに入るかわからんからいったんこのまま
+    driver.find_element_by_id("name").send_keys("ゲーム")
+    time.sleep(2)
+    driver.find_element_by_id("detail").send_keys("ps4")
+    time.sleep(2)
+    driver.find_element_by_id("category_name").send_keys("エレキギター")
+    time.sleep(2)
+    driver.find_element_by_id("status").send_keys("未使用に近い")
+    time.sleep(2)
+    driver.find_element_by_id("carriage").send_keys("着払い（購入者が負担）")
+    time.sleep(2)
+    driver.find_element_by_id("delivery_method").send_keys("着払い（購入者が負担）")
+    time.sleep(2)
+    driver.find_element_by_id("delivery_date").send_keys("支払い後、2～3日で発送")
+    time.sleep(2)
+    driver.find_element_by_id("delivery_area").send_keys("沖縄")
+    time.sleep(2)
+    driver.find_element_by_id("request_required").send_keys("あり")
+    time.sleep(2)
+    driver.find_element_by_id("sell_price").send_keys("1000")
+    time.sleep(2)
+    print("終了")
     
 
 if __name__ == "__main__":

@@ -72,6 +72,8 @@ def set_driver(driver_path, headless_flg):
 def listing():
 
     FIST_URL = "https://fril.jp/item/new"
+    # 絶対パスじゃなきゃいかんのかい？
+    IMG_PATH = 'C:\\Users\\hirayama\\src\\firebase-test\\dog.jpg'
     
     # driverを起動
     if os.name == 'nt': #Windows
@@ -102,11 +104,27 @@ def listing():
     time.sleep(10)
 
     # 何がsend_keysに入るかわからんからいったんこのまま
+    driver.find_element_by_id("image_tmp").send_keys(IMG_PATH)
+    time.sleep(2)
     driver.find_element_by_id("name").send_keys("ゲーム")
     time.sleep(2)
     driver.find_element_by_id("detail").send_keys("ps4")
-    time.sleep(2)
-    driver.find_element_by_id("category_name").send_keys("エレキギター")
+    # time.sleep(2)
+
+    # カテゴリのところ
+    driver.find_elements_by_link_text("指定なし")[0].click()
+    time.sleep(1)
+    driver.find_element_by_link_text("レディース").click()
+    driver.find_element_by_link_text("トップス").click()
+    time.sleep(1)
+    driver.find_element_by_link_text("Tシャツ(半袖/袖なし)").click()
+    time.sleep(1)
+    # サイズ指定(上で指定なしが消えるからまた0番目になる→要素一つでいいような気がするけど)
+    driver.find_elements_by_link_text("指定なし")[0].click()
+    time.sleep(1)
+    driver.find_element_by_link_text("S").click()
+
+
     time.sleep(2)
     driver.find_element_by_id("status").send_keys("未使用に近い")
     time.sleep(2)
@@ -120,7 +138,7 @@ def listing():
     time.sleep(2)
     driver.find_element_by_id("request_required").send_keys("あり")
     time.sleep(2)
-    driver.find_element_by_id("sell_price").send_keys("1000")
+    driver.find_element_by_id("sell_price").send_keys(1000)
     time.sleep(2)
     print("終了")
     

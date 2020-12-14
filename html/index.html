@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>eel</title>
+</head>
+<body>
+    
+    <p>ログイン画面</p>
+    <input id ="loin" type="loin" name="loin" placeholder="パスワードを入力">
+    <input id ="submit" type="submit" name="submit" value="ログイン" onclick="login_check();">
+    <div id="p">
+        <p id="p1">ログイン</p>
+        <p id="p2">text</p>
+    </div>
+    <script type="text/javascript" src="/eel.js"></script>
+
+
+    <script type="text/javascript">
+
+        eel.expose(login_check)
+        function login_check() {
+            if (login.value == "" || submit.value == "") {
+                alert("パスワードが違います");
+                return false;
+            }
+            else {
+                
+            }
+        }
+        // ロゴを表示する
+        function display(){
+            // IDを取得
+            var p1 = document.getElementById("p");
+            if (p1.style.display == "block") {
+                p1.style.display = "none";
+            }else {
+                p1.style.display = "block";
+            }
+            
+        }
+
+    </script>
+
+</body>
+</html>

@@ -77,12 +77,12 @@ def set_driver(driver_path, headless_flg):
     # ChromeのWebDriverオブジェクトを作成する。
     return Chrome(executable_path=os.getcwd() + "/" + driver_path, options=options)
 
-
+@eel.expose
 def listing():
 
     FIST_URL = "https://fril.jp/item/new"
-    # 絶対パスじゃなきゃいかんのかい？
-    IMG_PATH = 'C:\\Users\\hirayama\\src\\firebase-test\\dog.jpg'
+    # 絶対パス？？
+    IMG_PATH = 'C:\\Users\\hirayama\\src\\firebase-rukuma\\dog.jpg'
     
     # driverを起動
     if os.name == 'nt': #Windows

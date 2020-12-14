@@ -36,18 +36,18 @@ def login(inp):
                 if inp != mykey:
                     print('パスワードが違います。再度入力してください。')
                     eel.undisplay()
-                    eel.write("{}はいません.再度入力してくれ".format(inp))
+                    eel.write("{}はいません.再度入力してください".format(inp))
                     break
                     
                 else:
                     print('ログイン成功')
                     eel.display()
-                    eel.write("{}はいるよ。ログイン成功".format(inp))
+                    eel.write("Hello {} ! ログイン成功".format(inp))
                     
                     time.sleep(1)
                     # 何かしらの関数
                     # print(myprint(inp))
-                    # listing()
+                    eel.run()
                     
                     break
 

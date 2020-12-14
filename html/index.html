@@ -19,7 +19,7 @@
     </div>
 
     <div id="tool">
-        <button id="button" name="button" > ツール実行ボタン</button>
+        <button id="button" name="button" onclick="run();"> ツール実行ボタン</button>
     </div>
 
 
@@ -38,21 +38,28 @@
                 return false;
             }
             else {
-                eel.login(login.value)
-                display()
+                eel.login(login.value);
+                display();
 
                 _sleep(5000)
                 return false;
 
             }
         }
-        // ロゴを表示する
+        // ツールボタンが押されたときにpythonファイルlisting()関数が呼ばれるようにする関数
+        eel.expose(run)
+        function run() {
+            eel.listing();
+
+        }
+        // ツールを表示する関数
         eel.expose(display)
         function display(){
             // IDを取得
             var p1 = document.getElementById("tool");
             p1.style.display = "block";
         }
+        // ツールを非表示にする関数
         eel.expose(undisplay)
         function undisplay(){
             var p2 = document.getElementById("tool");

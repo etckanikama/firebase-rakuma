@@ -12,6 +12,7 @@ import time
 import datetime
 import pandas as pd
 import sys
+import eel
 
 cred = credentials.Certificate('./firstdatabase-19295-firebase-adminsdk-c7g6z-c758718277.json')
 app = firebase_admin.initialize_app(cred)
@@ -20,7 +21,7 @@ db = firestore.client()
 
 
 
-def main():
+def login(inp):
     users_ref = db.collection(u'users')
     docs = users_ref.stream()
     print("Firebaseを参照にパスワードとなるkeyを入力してください：")
@@ -33,16 +34,18 @@ def main():
                 inp = input()
                 if inp != mykey:
                     print('パスワードが違います。再度入力してください。')
+                    eel.write("{}はいません.再度入力してくれ".format(inp))
                 else:
                     print('ログイン成功')
+                    eel.write("{}はいるよ。ログイン成功".format(inp))
                     # 何かしらの関数
-                    print(myprint(inp))
-                    listing()
+                    # print(myprint(inp))
+                    # listing()
                     
                     break
 
 
-
+"""
 def myprint(a):
     return 'Hello '+a+' !'
 
@@ -142,6 +145,6 @@ def listing():
     time.sleep(2)
     print("終了")
     
-
-if __name__ == "__main__":
-    main()
+"""
+# if __name__ == "__main__":
+#     login()

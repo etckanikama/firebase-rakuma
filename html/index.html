@@ -8,25 +8,36 @@
 <body>
     
     <p>ログイン画面</p>
-    <input id ="loin" type="loin" name="loin" placeholder="パスワードを入力">
+    <input id ="login" type="loin" name="loin" placeholder="パスワードを入力">
     <input id ="submit" type="submit" name="submit" value="ログイン" onclick="login_check();">
     <div id="p">
         <p id="p1">ログイン</p>
         <p id="p2">text</p>
     </div>
+    <p>表示</p>
+    <textarea id ="result" name="show" cols="30" rows="30"></textarea>
     <script type="text/javascript" src="/eel.js"></script>
 
 
     <script type="text/javascript">
+        const _sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-        eel.expose(login_check)
+        eel.expose(write)
+        function write(text) {
+            result.value += text +"\n";
+        }
+
         function login_check() {
             if (login.value == "" || submit.value == "") {
-                alert("パスワードが違います");
+                alert("パスワードを入力してください");
                 return false;
             }
             else {
-                
+                eel.login(login.value)
+
+                _sleep(5000)
+                return false;
+
             }
         }
         // ロゴを表示する

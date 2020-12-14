@@ -22,6 +22,7 @@ db = firestore.client()
 
 
 def login(inp):
+    
     users_ref = db.collection(u'users')
     docs = users_ref.stream()
     print("Firebaseを参照にパスワードとなるkeyを入力してください：")
@@ -31,13 +32,19 @@ def login(inp):
         for mykey in doc.to_dict().values():
             # print(mykey)
             while (True):
-                inp = input()
+                # inp = input()
                 if inp != mykey:
                     print('パスワードが違います。再度入力してください。')
+                    eel.undisplay()
                     eel.write("{}はいません.再度入力してくれ".format(inp))
+                    break
+                    
                 else:
                     print('ログイン成功')
+                    eel.display()
                     eel.write("{}はいるよ。ログイン成功".format(inp))
+                    
+                    time.sleep(1)
                     # 何かしらの関数
                     # print(myprint(inp))
                     # listing()
@@ -45,7 +52,6 @@ def login(inp):
                     break
 
 
-"""
 def myprint(a):
     return 'Hello '+a+' !'
 
@@ -145,6 +151,6 @@ def listing():
     time.sleep(2)
     print("終了")
     
-"""
+
 # if __name__ == "__main__":
 #     login()

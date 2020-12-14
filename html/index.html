@@ -11,12 +11,17 @@
     <input id ="login" type="loin" name="loin" placeholder="パスワードを入力">
     <input id ="submit" type="submit" name="submit" value="ログイン" onclick="login_check();">
     <div id="p">
-        <p id="p1">ログイン</p>
-        <p id="p2">text</p>
+        <!-- <p id="p1">ログイン</p>
+        <p id="p2">text</p> -->
+        <p>表示</p>
+        <textarea id ="result" name="show" cols="100" rows="3"></textarea>
+        <script type="text/javascript" src="/eel.js"></script>
     </div>
-    <p>表示</p>
-    <textarea id ="result" name="show" cols="30" rows="30"></textarea>
-    <script type="text/javascript" src="/eel.js"></script>
+
+    <div id="tool">
+        <button id="button" name="button" > ツール実行ボタン</button>
+    </div>
+
 
 
     <script type="text/javascript">
@@ -24,7 +29,7 @@
 
         eel.expose(write)
         function write(text) {
-            result.value += text +"\n";
+            result.value = text +"\n";
         }
 
         function login_check() {
@@ -34,6 +39,7 @@
             }
             else {
                 eel.login(login.value)
+                display()
 
                 _sleep(5000)
                 return false;
@@ -41,15 +47,16 @@
             }
         }
         // ロゴを表示する
+        eel.expose(display)
         function display(){
             // IDを取得
-            var p1 = document.getElementById("p");
-            if (p1.style.display == "block") {
-                p1.style.display = "none";
-            }else {
-                p1.style.display = "block";
-            }
-            
+            var p1 = document.getElementById("tool");
+            p1.style.display = "block";
+        }
+        eel.expose(undisplay)
+        function undisplay(){
+            var p2 = document.getElementById("tool");
+            p2.style.display = "none";
         }
 
     </script>

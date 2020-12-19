@@ -161,7 +161,7 @@ def listing():
         driver.find_element_by_id("submit").click()
         # 一番上のurlと出品した時点の日付を取得してcsvに書きこみ
         time.sleep(2)
-        sell_time = datetime.datetime.now()
+        sell_time = datetime.datetime.today()
         detail_url = driver.find_element_by_class_name("media-left").find_element_by_tag_name("a").get_attribute("href")
         print(detail_url)
         time.sleep(2)
@@ -170,21 +170,52 @@ def listing():
         # driver.get(f'{detail_url}')
         
         print("終了")
+        if i==0:
+            break
+
+@eel.expose
+def nesage():
+    
 
 
-def nesage(date,url):
-    # x,yはあとで変更できるようにする
-    # 商品urlを開く
+
+    # driverの起動
+    if os.name == 'nt': #Windows
+        driver = set_driver("chromedriver.exe", False)
+    elif os.name == 'posix': #Mac
+        driver = set_driver("chromedriver", False)
+
+
+   
+    # log.csvを読み込み
+    df = pd.read_csv("./url_data_log.csv")
+    # 商品の詳細urlを開く
+    # このとき例外があるはず。→データがない時とか
+    # 
     # a=出品した時のログ商品期日を確認
     # b=現在の日付を確認
-    # aとbを比較→n日or n時間
-    # if (n＞x日以上)→商品の値段をy%下げる
+    # aとbを比較→n日 or n時間
+    #  # x,yはあとで変更できるようにする？？
+    # if (n＞x日以上){
+    # → 詳細url内の金額情報を取得（スクレイピング）→intに変換
+    # →金額情報とurl情報をcsvから削除
+    # →商品の値段をy%下げる
+    # →下げた値段でsend_keys
+    # →更新ボタンを押す
+    # →再度urlと期日をcsvに書きこみ
+    # →
+    # }
+    # 
+    # 
+    # 
     # elseならスルーする→次の商品urlを開く
 
 
     pass
 
 def write_csv(sell_time,detail_url):
+    to_str = str(sell_time)
+    sell_time = to_str.replace('.','')
     colum = ['出品期日','商品URL']
     df = pd.DataFrame([[sell_time,detail_url]])
     df.to_csv("url_date_log.csv",index=False,mode='a',header=False)

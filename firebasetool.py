@@ -4,6 +4,7 @@ from firebase_admin import firestore
 
 from base64 import a85encode
 import os
+from pandas.core.algorithms import mode
 from selenium.webdriver import Chrome, ChromeOptions
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions
@@ -47,8 +48,8 @@ def login(inp):
                     time.sleep(1)
                     # 何かしらの関数
                     # print(myprint(inp))
-                    eel.run()
                     
+
                     break
 
 
@@ -82,7 +83,7 @@ def listing():
 
     FIST_URL = "https://fril.jp/item/new"
     # 絶対パス？？
-    IMG_PATH = 'C:\\Users\\hirayama\\src\\firebase-rukuma\\dog.jpg'
+    # IMG_PATH = 'C:\\Users\\hirayama\\src\\firebase-rukuma\\img\\dog.jpg'
     
     # driverを起動
     if os.name == 'nt': #Windows
@@ -106,51 +107,87 @@ def listing():
     # print(login_url)
     # driver.get(f'{login_url}')
     # time.sleep(10)
+    
     #指定したdriverに対して最大で10秒間待つように設定する
     wait = WebDriverWait(driver, 1000)
     element = wait.until(expected_conditions.visibility_of_element_located((By.CLASS_NAME, "headerMenu__text")))
-    driver.get(FIST_URL)
-    time.sleep(10)
-
-    # 何がsend_keysに入るかわからんからいったんこのまま
-    driver.find_element_by_id("image_tmp").send_keys(IMG_PATH)
-    time.sleep(2)
-    driver.find_element_by_id("name").send_keys("ゲーム")
-    time.sleep(2)
-    driver.find_element_by_id("detail").send_keys("ps4")
-    # time.sleep(2)
-
-    # カテゴリのところ
-    driver.find_elements_by_link_text("指定なし")[0].click()
-    time.sleep(1)
-    driver.find_element_by_link_text("レディース").click()
-    driver.find_element_by_link_text("トップス").click()
-    time.sleep(1)
-    driver.find_element_by_link_text("Tシャツ(半袖/袖なし)").click()
-    time.sleep(1)
-    # サイズ指定(上で指定なしが消えるからまた0番目になる→要素一つでいいような気がするけど)
-    driver.find_elements_by_link_text("指定なし")[0].click()
-    time.sleep(1)
-    driver.find_element_by_link_text("S").click()
 
 
-    time.sleep(2)
-    driver.find_element_by_id("status").send_keys("未使用に近い")
-    time.sleep(2)
-    driver.find_element_by_id("carriage").send_keys("着払い（購入者が負担）")
-    time.sleep(2)
-    driver.find_element_by_id("delivery_method").send_keys("着払い（購入者が負担）")
-    time.sleep(2)
-    driver.find_element_by_id("delivery_date").send_keys("支払い後、2～3日で発送")
-    time.sleep(2)
-    driver.find_element_by_id("delivery_area").send_keys("沖縄")
-    time.sleep(2)
-    driver.find_element_by_id("request_required").send_keys("あり")
-    time.sleep(2)
-    driver.find_element_by_id("sell_price").send_keys(1000)
-    time.sleep(2)
-    print("終了")
-    
+    df = pd.read_csv("./custom.csv")
+    for i in range(len(df)):
+        driver.get(FIST_URL)
+        time.sleep(2)
+        
+        # 何がsend_keysに入るかわからんからいったんこのまま
+        driver.find_element_by_id("image_tmp").send_keys(*list(df["画像url"])[i:i+1])
+        time.sleep(2)
+        driver.find_element_by_id("name").send_keys(*list(df["商品タイトル"])[i:i+1])
+        time.sleep(2)
+        driver.find_element_by_id("detail").send_keys(*list(df["商品説明"])[i:i+1])
+        # time.sleep(2)
+
+        # カテゴリのところ
+        driver.find_elements_by_link_text("指定なし")[0].click()
+        time.sleep(1)
+        driver.find_element_by_link_text(*list(df["カテゴリ1"])[i:i+1]).click()
+        driver.find_element_by_link_text(*list(df["カテゴリ2"])[i:i+1]).click()
+        time.sleep(1)
+        driver.find_element_by_link_text(*list(df["カテゴリ3"])[i:i+1]).click()
+        time.sleep(1)
+        # サイズ指定(上で指定なしが消えるからまた0番目になる→要素一つでいいような気がするけど)
+        # driver.find_elements_by_link_text("指定なし")[0].click()
+        # time.sleep(1)
+        # 洋服はあり得ない
+        # driver.find_element_by_link_text("S").click()
+
+
+        time.sleep(2)
+        driver.find_element_by_id("status").send_keys("未使用に近い")
+        time.sleep(2)
+        driver.find_element_by_id("carriage").send_keys("着払い（購入者が負担）")
+        time.sleep(2)
+        driver.find_element_by_id("delivery_method").send_keys("着払い（購入者が負担）")
+        time.sleep(2)
+        driver.find_element_by_id("delivery_date").send_keys("支払い後、2～3日で発送")
+        time.sleep(2)
+        driver.find_element_by_id("delivery_area").send_keys("沖縄")
+        time.sleep(2)
+        driver.find_element_by_id("request_required").send_keys("あり")
+        time.sleep(2)
+        driver.find_element_by_id("sell_price").send_keys(int(*list(df["金額"])[i:i+1]))
+        time.sleep(2)
+        driver.find_element_by_id("confirm").click()
+        time.sleep(1)
+        driver.find_element_by_id("submit").click()
+        # 一番上のurlと出品した時点の日付を取得してcsvに書きこみ
+        time.sleep(2)
+        sell_time = datetime.datetime.now()
+        detail_url = driver.find_element_by_class_name("media-left").find_element_by_tag_name("a").get_attribute("href")
+        print(detail_url)
+        time.sleep(2)
+        write_csv(sell_time,detail_url)
+        # urlだけ保持しておくなら開く必要はない。
+        # driver.get(f'{detail_url}')
+        
+        print("終了")
+
+
+def nesage(date,url):
+    # x,yはあとで変更できるようにする
+    # 商品urlを開く
+    # a=出品した時のログ商品期日を確認
+    # b=現在の日付を確認
+    # aとbを比較→n日or n時間
+    # if (n＞x日以上)→商品の値段をy%下げる
+    # elseならスルーする→次の商品urlを開く
+
+
+    pass
+
+def write_csv(sell_time,detail_url):
+    colum = ['出品期日','商品URL']
+    df = pd.DataFrame([[sell_time,detail_url]])
+    df.to_csv("url_date_log.csv",index=False,mode='a',header=False)
 
 # if __name__ == "__main__":
 #     login()

@@ -217,8 +217,8 @@ def nesage():
             # timedelta型で差をとる
             delta = abs(now_time - log_datetime)
             print(delta.seconds)
-            # いったん秒数で比較10秒以上立ってたら
-            if delta.seconds > 10:
+            # いったん秒数で比較1000秒以上立ってたら
+            if delta.seconds > 1000:
                 # とりあえず0.1値下げ
                 # 価格情報を保持
                 money =int(list(df["商品価格"])[i:i+1][0])

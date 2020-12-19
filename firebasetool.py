@@ -165,20 +165,23 @@ def listing():
         time.sleep(2)
         driver.find_element_by_id("request_required").send_keys("あり")
         time.sleep(2)
+
         driver.find_element_by_id("sell_price").send_keys(int(*list(df["金額"])[i:i+1]))
+
         time.sleep(2)
         driver.find_element_by_id("confirm").click()
         time.sleep(1)
         driver.find_element_by_id("submit").click()
         # 一番上のurlと出品した時点の日付を取得してcsvに書きこみ
         time.sleep(2)
-
         detail_url = driver.find_element_by_class_name("media-left").find_element_by_tag_name("a").get_attribute("href")
         print(detail_url)
         time.sleep(2)
         sell_time = datetime.datetime.today()
         time.sleep(1)
-        write_csv(sell_time,detail_url)
+        money =int(list(df["金額"])[i:i+1][0])
+
+        write_csv(sell_time,detail_url,money)
         # urlだけ保持しておくなら開く必要はない。
         # driver.get(f'{detail_url}')
         
@@ -195,19 +198,55 @@ def nesage():
     elif os.name == 'posix': #Mac
         driver = set_driver("chromedriver", False)
     # log.csvを読み込み
-    df = pd.read_csv("./url_data_log.csv")
+    df = pd.read_csv("./url_date_log.csv")
     # 商品の詳細urlを開く
-    driver.get(f'{list(df["商品URL"])[0:1][0]}')
-    time.sleep(1)
-    print("Hello")
-    # for i in range(len(df)):
-    #     # urlが存在しない時の例外
-    #     try:
-    #         driver.get(f'{list(df["商品URL"])[i:i+1][0]}')
-    #         time.sleep(2)
+    # driver.get(f'{list(df["商品URL"])[0:1][0]}')
+    # time.sleep(1)
+    print("今の時刻を表示")
+    now_time = datetime.datetime.now()
+    for i in range(len(df)):
+        # urlが存在しない時の例外
 
-    #     except:
-    #         print("存在しない")
+        try:
+            driver.get(f'{list(df["商品URL"])[i:i+1][0]}')
+            time.sleep(2)
+            # 編集ボタンを押す
+            driver.find_element_by_xpath("//a[@class='ga-class ga-item-buybutton btn btn-primary btn-large btn_buy ga-loggedin']").click()
+            # datetime.datetime型に変換
+            log_datetime = datetime.datetime.strptime(list(df["出品期日"])[i:i+1][0],'%Y-%m-%d %H:%M:%S')
+            # timedelta型で差をとる
+            delta = abs(now_time - log_datetime)
+            print(delta.seconds)
+            # いったん秒数で比較10秒以上立ってたら
+            if delta.seconds > 10:
+                # とりあえず0.1値下げ
+                # 価格情報を保持
+                money =int(list(df["商品価格"])[i:i+1][0])
+                print(money)
+                # 書き換えを行う行を削除
+                df.drop(i)
+                driver.find_element_by_id("sell_price").send_keys(money*0.1)
+                time.sleep(1)
+                driver.find_element_by_id("confirm").click()
+                time.sleep(1)
+                driver.find_element_by_id("submit").click()
+                # 一番上のurlを取得し、時間、お金を再度更新
+                time.sleep(2)
+                detail_url = driver.find_element_by_class_name("media-left").find_element_by_tag_name("a").get_attribute("href")
+                print(detail_url)
+                time.sleep(2)
+                sell_time = datetime.datetime.today()
+                time.sleep(1)
+                money =money*0.1
+
+                write_csv(sell_time,detail_url,money)
+                print("終了")
+            else:
+                break
+                
+
+        except:
+            print("存在しない")
 
     # このとき例外があるはず。→データがない時とか
     # 
@@ -217,11 +256,11 @@ def nesage():
     #  # x,yはあとで変更できるようにする？？
     # if (n＞=x日以上){
     # → 詳細url内の金額情報を取得（スクレイピング）→intに変換
-    # →金額情報とurl情報をcsvから削除
+    # →期日,url,金額をcsvから削除
     # →商品の値段をy%下げる
     # →下げた値段でsend_keys
     # →更新ボタンを押す
-    # →再度urlと期日をcsvに書きこみ
+    # →再度、期日,url,金額をcsvに書きこみ
     # →
     # }
     # 
@@ -230,16 +269,16 @@ def nesage():
     # elseならスルーする→次の商品urlを開く
 
 
-    pass
+    
 
-def write_csv(sell_time,detail_url):
+def write_csv(sell_time,detail_url,money):
     print(type(sell_time))
     to_str = str(sell_time)
     print(type(to_str))
     pos = to_str.find('.')
     sell_time = to_str[:pos]
-    colum = ['出品期日','商品URL']
-    df = pd.DataFrame([[sell_time,detail_url]])
+    colum = ['出品期日','商品URL','商品価格']
+    df = pd.DataFrame([[sell_time,detail_url,money]])
     df.to_csv("url_date_log.csv",index=False,mode='a',header=False)
 
 # if __name__ == "__main__":

@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>eel</title>
+    <title>ラクマ出品ツール</title>
 </head>
 <body>
     
     <p>ログイン画面</p>
     <input id ="login" type="loin" name="loin" placeholder="パスワードを入力">
-    <input id ="submit" type="submit" name="submit" value="ログイン" onclick="login_check();">
+    <input id ="submit" type="button" name="submit" value="ログイン" onclick="login_check();">
     <div id="p">
         <!-- <p id="p1">ログイン</p>
         <p id="p2">text</p> -->
@@ -18,9 +18,17 @@
         <script type="text/javascript" src="/eel.js"></script>
     </div>
 
-    <div id="tool">
-        <button id="button" name="button" onclick="run();"> ツール実行ボタン</button>
+    <p>以下のボタンを押すとcsvにある情報から自動で出品をすることが出来ます</p>
+    <div id="tool" onclick="run();">
+        <button id="button" name="button"> ツール実行ボタン</button>
     </div>
+    <br>
+    
+    <p>以下のボタンを押すと現在出品されている商品の中からN日以上売れていない物の金額をY%値下げします。</p>
+    <div id="tool" onclick="nesage_run();">
+        <button id="button" name="button"> 値下げ実行ボタン</button>
+    </div>
+
 
 
 
@@ -49,9 +57,19 @@
         // ツールボタンが押されたときにpythonファイルlisting()関数が呼ばれるようにする関数
         eel.expose(run)
         function run() {
+            // ボタン押されるまで待機しろよ...
+            // pythonの関数が実行される
             eel.listing();
-
         }
+
+        eel.expose(nesage_run)
+        function nesage_run() {
+            // ボタン押されるまで待機しろよ...
+            // pythonの関数が実行される
+            eel.nesage();
+        }
+
+
         // ツールを表示する関数
         eel.expose(display)
         function display(){

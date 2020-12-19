@@ -12,3 +12,9 @@
 - Eel
 - JavaScript
 - HTML
+
+# 実行の手順
+
+```
+python main.py 
+```

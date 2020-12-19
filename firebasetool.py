@@ -95,18 +95,6 @@ def listing():
     driver.get(FIST_URL)
     time.sleep(5)
 
-    # 文字列ログイン探す
-    # （あったらログインボタンを開く→その後に手動ログインをする）
-    # なくなるまで待機
-    # なかったらその後の処理を実行
-    # login_button_get = driver.find_element_by_xpath("//li[@class='loginMenu__listItem']/a[@class='button button--NoBorderSmall ga-class ga-login-button ga-guest']")
-    
-    # time.sleep(10)
-    # print(login_button_get.text)
-    # login_url = login_button_get.get_attribute("href")
-    # print(login_url)
-    # driver.get(f'{login_url}')
-    # time.sleep(10)
     
     #指定したdriverに対して最大で10秒間待つように設定する
     wait = WebDriverWait(driver, 1000)
@@ -128,18 +116,40 @@ def listing():
 
         # カテゴリのところ
         driver.find_elements_by_link_text("指定なし")[0].click()
-        time.sleep(1)
-        driver.find_element_by_link_text(*list(df["カテゴリ1"])[i:i+1]).click()
-        driver.find_element_by_link_text(*list(df["カテゴリ2"])[i:i+1]).click()
-        time.sleep(1)
-        driver.find_element_by_link_text(*list(df["カテゴリ3"])[i:i+1]).click()
-        time.sleep(1)
+        # time.sleep(1)
+        # driver.find_element_by_link_text(*list(df["カテゴリ1"])[i:i+1]).click()
+        # driver.find_element_by_link_text(*list(df["カテゴリ2"])[i:i+1]).click()
+        # time.sleep(1)
+        # driver.find_element_by_link_text(*list(df["カテゴリ3"])[i:i+1]).click()
+        # time.sleep(1)
         # サイズ指定(上で指定なしが消えるからまた0番目になる→要素一つでいいような気がするけど)
         # driver.find_elements_by_link_text("指定なし")[0].click()
         # time.sleep(1)
         # 洋服はあり得ない
         # driver.find_element_by_link_text("S").click()
 
+        # カテゴリの所→textの取得
+        # 親要素のテキスト（複数）を取得
+        parent_text = driver.find_elements_by_xpath("//span[@class='parent_name']")
+        # print(parent_text.text)
+        for parent in parent_text:
+            if parent.text == list(df["カテゴリ1"])[i:i+1][0]:
+                parent.click()
+                break
+        time.sleep(1)
+        # 子要素のテキスト（複数）を取得
+        child_text = driver.find_elements_by_xpath("//a[@class='list-group-item small branch']")
+        for child in child_text:
+            if child.text == list(df["カテゴリ2"])[i:i+1][0]:
+                child.click()
+                break
+
+        # 孫要素のテキスト（複数）を取得
+        mago_text = driver.find_elements_by_xpath("//a[@class='list-group-item small leaf']")
+        for mago in mago_text:
+            if mago.text == list(df["カテゴリ3"])[i:i+1][0]:
+                mago.click()
+                break
 
         time.sleep(2)
         driver.find_element_by_id("status").send_keys("未使用に近い")
@@ -150,6 +160,7 @@ def listing():
         time.sleep(2)
         driver.find_element_by_id("delivery_date").send_keys("支払い後、2～3日で発送")
         time.sleep(2)
+
         driver.find_element_by_id("delivery_area").send_keys("沖縄")
         time.sleep(2)
         driver.find_element_by_id("request_required").send_keys("あり")
@@ -161,42 +172,50 @@ def listing():
         driver.find_element_by_id("submit").click()
         # 一番上のurlと出品した時点の日付を取得してcsvに書きこみ
         time.sleep(2)
-        sell_time = datetime.datetime.today()
+
         detail_url = driver.find_element_by_class_name("media-left").find_element_by_tag_name("a").get_attribute("href")
         print(detail_url)
         time.sleep(2)
+        sell_time = datetime.datetime.today()
+        time.sleep(1)
         write_csv(sell_time,detail_url)
         # urlだけ保持しておくなら開く必要はない。
         # driver.get(f'{detail_url}')
         
+        
         print("終了")
-        if i==0:
-            break
+
 
 @eel.expose
 def nesage():
     
-
-
-
     # driverの起動
     if os.name == 'nt': #Windows
         driver = set_driver("chromedriver.exe", False)
     elif os.name == 'posix': #Mac
         driver = set_driver("chromedriver", False)
-
-
-   
     # log.csvを読み込み
     df = pd.read_csv("./url_data_log.csv")
     # 商品の詳細urlを開く
+    driver.get(f'{list(df["商品URL"])[0:1][0]}')
+    time.sleep(1)
+    print("Hello")
+    # for i in range(len(df)):
+    #     # urlが存在しない時の例外
+    #     try:
+    #         driver.get(f'{list(df["商品URL"])[i:i+1][0]}')
+    #         time.sleep(2)
+
+    #     except:
+    #         print("存在しない")
+
     # このとき例外があるはず。→データがない時とか
     # 
     # a=出品した時のログ商品期日を確認
     # b=現在の日付を確認
     # aとbを比較→n日 or n時間
     #  # x,yはあとで変更できるようにする？？
-    # if (n＞x日以上){
+    # if (n＞=x日以上){
     # → 詳細url内の金額情報を取得（スクレイピング）→intに変換
     # →金額情報とurl情報をcsvから削除
     # →商品の値段をy%下げる
@@ -214,8 +233,11 @@ def nesage():
     pass
 
 def write_csv(sell_time,detail_url):
+    print(type(sell_time))
     to_str = str(sell_time)
-    sell_time = to_str.replace('.','')
+    print(type(to_str))
+    pos = to_str.find('.')
+    sell_time = to_str[:pos]
     colum = ['出品期日','商品URL']
     df = pd.DataFrame([[sell_time,detail_url]])
     df.to_csv("url_date_log.csv",index=False,mode='a',header=False)

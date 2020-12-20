@@ -7,26 +7,30 @@
 </head>
 <body>
     
-    <p>ログイン画面</p>
+    <p>ログイン画面です。パスワードを入力してください。</p>
     <input id ="login" type="loin" name="loin" placeholder="パスワードを入力">
     <input id ="submit" type="button" name="submit" value="ログイン" onclick="login_check();">
     <div id="p">
         <!-- <p id="p1">ログイン</p>
         <p id="p2">text</p> -->
-        <p>表示</p>
+        <p>ログインできるかどうか確認をします</p>
         <textarea id ="result" name="show" cols="100" rows="3"></textarea>
         <script type="text/javascript" src="/eel.js"></script>
     </div>
 
-    <p>以下のボタンを押すとcsvにある情報から自動で出品をすることが出来ます</p>
+    
     <div id="tool" onclick="run();">
+        <p>以下のボタンを押すとcsvにある情報から自動で出品をすることが出来ます</p>
         <button id="button" name="button"> ツール実行ボタン</button>
     </div>
     <br>
     
-    <p>以下のボタンを押すと現在出品されている商品の中からN日以上売れていない物の金額をY%値下げします。</p>
-    <div id="tool" onclick="nesage_run();">
-        <button id="button" name="button"> 値下げ実行ボタン</button>
+    
+    <div id="tool_n">
+        <p>値下げして再出品するために、日数と%の指定をしてボタンを押してください</p>
+        <input id="date" type="text" name="date"placeholder="日数を指定してください"><i>日以上うれていないものを</i>
+        <input id="parcent" type="text" name="parcent"placeholder="数字を入れてください"><i>%値下げして再出品します</i>  
+        <button id="button" name="button" onclick="date_parcent_check();"> 値下げ実行ボタン</button>
     </div>
 
 
@@ -34,7 +38,24 @@
 
     <script type="text/javascript">
         const _sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
+        // ツールを表示する関数
+        eel.expose(display)
+        function display(){
+            // IDを取得
+            var p1 = document.getElementById("tool");
+            var n1 = document.getElementById("tool_n");
+            p1.style.display = "block";
+            n1.style.display = "block";
+        }
+        // ツールを非表示にする関数
+        eel.expose(undisplay)
+        function undisplay(){
+            var p2 = document.getElementById("tool");
+            var n2 = document.getElementById("tool_n");
+            p2.style.display = "none";
+            n2.style.display = "none";
+        }
+        
         eel.expose(write)
         function write(text) {
             result.value = text +"\n";
@@ -54,6 +75,19 @@
 
             }
         }
+        function date_parcent_check() {
+            if (date.value == "" || parcent.value == "") {
+                alert("日数または%が空欄です");
+                return false;
+            }
+            else {
+                // valueを値下げかんすうに渡す
+                eel.nesage(date.value,parcent.value)
+                _sleep(5000)
+                return false;
+            }
+        }
+
         // ツールボタンが押されたときにpythonファイルlisting()関数が呼ばれるようにする関数
         eel.expose(run)
         function run() {
@@ -62,27 +96,15 @@
             eel.listing();
         }
 
-        eel.expose(nesage_run)
-        function nesage_run() {
-            // ボタン押されるまで待機しろよ...
-            // pythonの関数が実行される
-            eel.nesage();
-        }
+        // eel.expose(nesage_run)
+        // function nesage_run() {
+        //     // ボタン押されるまで待機しろよ...
+        //     // pythonの関数が実行される
+        //     eel.nesage();
+        // }
 
 
-        // ツールを表示する関数
-        eel.expose(display)
-        function display(){
-            // IDを取得
-            var p1 = document.getElementById("tool");
-            p1.style.display = "block";
-        }
-        // ツールを非表示にする関数
-        eel.expose(undisplay)
-        function undisplay(){
-            var p2 = document.getElementById("tool");
-            p2.style.display = "none";
-        }
+
 
     </script>
 

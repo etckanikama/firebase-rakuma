@@ -38,6 +38,8 @@
 
     <script type="text/javascript">
         const _sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+        undisplay()
         // ツールを表示する関数
         eel.expose(display)
         function display(){
@@ -55,7 +57,7 @@
             p2.style.display = "none";
             n2.style.display = "none";
         }
-        
+
         eel.expose(write)
         function write(text) {
             result.value = text +"\n";

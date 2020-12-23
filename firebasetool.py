@@ -22,6 +22,7 @@ db = firestore.client()
 
 
 
+
 def login(inp):
     
     users_ref = db.collection(u'users')
@@ -190,7 +191,10 @@ def listing():
 
 
 @eel.expose
-def nesage():
+def nesage(date,parcent):
+    parcent = int(parcent)
+    parcent = parcent/100
+    date = int(date)
     
     # driverの起動
     if os.name == 'nt': #Windows
@@ -204,28 +208,31 @@ def nesage():
     # time.sleep(1)
     print("今の時刻を表示")
     now_time = datetime.datetime.now()
+    print(now_time)
     for i in range(len(df)):
         # urlが存在しない時の例外
-
+        driver.get(f'{list(df["商品URL"])[i:i+1][0]}')
+        time.sleep(2)
+        
         try:
-            driver.get(f'{list(df["商品URL"])[i:i+1][0]}')
-            time.sleep(2)
-            # 編集ボタンを押す
+            # 編集ボタンを押す処理
             driver.find_element_by_xpath("//a[@class='ga-class ga-item-buybutton btn btn-primary btn-large btn_buy ga-loggedin']").click()
             # datetime.datetime型に変換
             log_datetime = datetime.datetime.strptime(list(df["出品期日"])[i:i+1][0],'%Y-%m-%d %H:%M:%S')
             # timedelta型で差をとる
             delta = abs(now_time - log_datetime)
             print(delta.seconds)
-            # いったん秒数で比較1000秒以上立ってたら
-            if delta.seconds > 1000:
+            # いったん秒数で比較1000日以上立ってたら(ほんとは日数がよい)
+            if delta.seconds > date:
                 # とりあえず0.1値下げ
                 # 価格情報を保持
                 money =int(list(df["商品価格"])[i:i+1][0])
                 print(money)
-                # 書き換えを行う行を削除
+                # 書き換えを行う行を削除→動いて無い？
                 df.drop(i)
-                driver.find_element_by_id("sell_price").send_keys(money*0.1)
+                
+                driver.find_element_by_id("sell_price").clear()
+                driver.find_element_by_id("sell_price").send_keys(int(money*parcent))
                 time.sleep(1)
                 driver.find_element_by_id("confirm").click()
                 time.sleep(1)
@@ -237,15 +244,17 @@ def nesage():
                 time.sleep(2)
                 sell_time = datetime.datetime.today()
                 time.sleep(1)
-                money =money*0.1
+                money =int(money*parcent)
 
                 write_csv(sell_time,detail_url,money)
                 print("終了")
-            else:
-                break
+
                 
 
         except:
+            # urlを踏んでも編集ボタンがない時→その行を削除しなきゃ
+            df.drop(i)
+            print(df)
             print("存在しない")
 
     # このとき例外があるはず。→データがない時とか
